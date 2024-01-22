@@ -12,7 +12,7 @@ function getMatieres(req, res) {
 
 // Récupérer une matière par son id (GET)
 function getMatiere(req, res) {
-    let matiereId = req.params.id;
+    let matiereId = req.params.idMatiere;
 
     Matiere.findOne({ _id: matiereId }, (err, matiere) => {
         if (err) { res.send(err) }
@@ -22,7 +22,17 @@ function getMatiere(req, res) {
 
 // Ajout d'une matière (POST)
 function postMatiere(req, res) {
-    let matiere = new Matiere(req.body);
+    let matiere = new Matiere();
+    matiere.idMatiere = req.body.idMatiere;
+    matiere.nom = req.body.nom;
+    matiere.enseignant = req.body.enseignant;
+    matiere.imageMatiere = req.body.imageMatiere;
+    matiere.imageProf = req.body.imageProf;
+    matiere.assignments = req.body.assignments;
+    matiere.eleves = req.body.eleves;
+
+    console.log("POST matiere reçu :");
+    console.log(matiere)
 
     matiere.save((err) => {
         if (err) {
@@ -34,7 +44,9 @@ function postMatiere(req, res) {
 
 // Update d'une matière (PUT)
 function updateMatiere(req, res) {
-    Matiere.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, matiere) => {
+    console.log("UPDATE recu matiere : ");
+    console.log(req.body);
+    Matiere.findByIdAndUpdate(req.params._id, req.body, { new: true }, (err, matiere) => {
         if (err) {
             res.send(err);
         }
@@ -44,7 +56,7 @@ function updateMatiere(req, res) {
 
 // Suppression d'une matière (DELETE)
 function deleteMatiere(req, res) {
-    Matiere.findByIdAndRemove(req.params.id, (err, matiere) => {
+    Matiere.findByIdAndRemove(req.params.idMatiere, (err, matiere) => {
         if (err) {
             res.send(err);
         }

@@ -2,6 +2,8 @@ let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
 let assignment = require('./routes/assignments');
+let matiere = require('./routes/matieres');
+let eleve = require('./routes/eleves');
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -22,6 +24,8 @@ mongoose.connect(uri, options)
     console.log("Connecté à la base MongoDB assignments dans le cloud !");
     console.log("at URI = " + uri);
     console.log("vérifiez with http://localhost:8010/api/assignments que cela fonctionne")
+    console.log("vérifiez with http://localhost:8010/api/matieres que cela fonctionne")
+    console.log("vérifiez with http://localhost:8010/api/eleves que cela fonctionne")
     },
     err => {
       console.log('Erreur de connexion: ', err);
@@ -46,6 +50,12 @@ const prefix = '/api';
 
 app.route(prefix + '/assignments')
   .get(assignment.getAssignments);
+
+/*app.route(prefix + '/matieres')
+  .get(assignment.getMatieres);
+
+app.route(prefix + '/eleves')
+  .get(assignment.getEleves);*/
 
 app.route(prefix + '/assignments/:id')
   .get(assignment.getAssignment)

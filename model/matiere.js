@@ -1,9 +1,15 @@
-const mongoose = require('mongoose');
+let mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
-const matiereSchema = new mongoose.Schema({
-  nom: String,
-  enseignant: String,
-  heures: Number
+let MatiereSchema = Schema({
+    idMatiere: Number,
+    nom: String,
+    enseignant: String,
+    imageMatiere: String,
+    imageProf: String,
+    assignments: [{type : mongoose.Schema.Types.ObjectId, ref: 'Assignment'}],
+    eleves: [{type : mongoose.Schema.Types.ObjectId, ref: 'Eleve'}]
 });
 
-module.exports = mongoose.model('Matiere', matiereSchema);
+// C'est à travers ce modèle Mongoose qu'on pourra faire le CRUD
+module.exports = mongoose.model('Matiere', MatiereSchema);

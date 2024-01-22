@@ -1,3 +1,4 @@
+const assignment = require('../model/assignment');
 let Eleve = require('../model/eleve');
 
 // Récupérer tous les élèves (GET)
@@ -12,7 +13,7 @@ function getEleves(req, res) {
 
 // Récupérer un élève par son id (GET)
 function getEleve(req, res) {
-    let eleveId = req.params.id;
+    let eleveId = req.params.idEleve;
 
     Eleve.findOne({ _id: eleveId }, (err, eleve) => {
         if (err) { res.send(err) }
@@ -22,11 +23,20 @@ function getEleve(req, res) {
 
 // Ajout d'un élève (POST)
 function postEleve(req, res) {
-    let eleve = new Eleve(req.body);
+    let eleve = new Eleve();
+    eleve.idEleve = req.body.idEleve;
+    eleve.nom = req.body.nom;
+    eleve.prenom = req.body.prenom;
+    eleve.note = req.body.note;
+    eleve.assignments = req.body.assignments;
+    eleve.matieres = req.body.matieres;
+
+    console.log("POST eleve reçu :");
+    console.log(eleve)
 
     eleve.save((err) => {
         if (err) {
-            res.send('Impossible de poster l\'élève', err);
+            res.send('cant post élève', err);
         }
         res.json({ message: `${eleve.nom} ${eleve.prenom} enregistré !` });
     });
@@ -34,8 +44,11 @@ function postEleve(req, res) {
 
 // Update d'un élève (PUT)
 function updateEleve(req, res) {
-    Eleve.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, eleve) => {
+    console.log("UPDATE recu eleve : ");
+    console.log(req.body);
+    Eleve.findByIdAndUpdate(req.params._id, req.body, { new: true }, (err, eleve) => {
         if (err) {
+            console.log(err);
             res.send(err);
         }
         res.json({ message: `${eleve.nom} ${eleve.prenom} mis à jour` });
@@ -44,7 +57,7 @@ function updateEleve(req, res) {
 
 // Suppression d'un élève (DELETE)
 function deleteEleve(req, res) {
-    Eleve.findByIdAndRemove(req.params.id, (err, eleve) => {
+    Eleve.findByIdAndRemove(req.params.idEleve, (err, eleve) => {
         if (err) {
             res.send(err);
         }
