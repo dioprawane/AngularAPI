@@ -27,9 +27,6 @@ function postEleve(req, res) {
     eleve.idEleve = req.body.idEleve;
     eleve.nom = req.body.nom;
     eleve.prenom = req.body.prenom;
-    eleve.note = req.body.note;
-    eleve.assignments = req.body.assignments;
-    eleve.matieres = req.body.matieres;
 
     console.log("POST eleve reçu :");
     console.log(eleve)
