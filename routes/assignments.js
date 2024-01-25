@@ -11,37 +11,52 @@ function getAssignments(req, res){
     });
 }
 
-// Récupérer un assignment par son id (GET)
+// Récupérer un assignment par son _id (GET)
 function getAssignment(req, res){
     let assignmentId = req.params.id;
 
-    Assignment.findOne({id: assignmentId}, (err, assignment) =>{
+    Assignment.findOne({_id: assignmentId}, (err, assignment) =>{
         if(err){res.send(err)}
         res.json(assignment);
-    })
+    });
 }
+
 
 // Ajout d'un assignment (POST)
-function postAssignment(req, res){
-    let assignment = new Assignment();
-    assignment.id = req.body.id;
-    assignment.nom = req.body.nom;
-    assignment.dateDeRendu = req.body.dateDeRendu;
-    assignment.rendu = req.body.rendu;
-    assignment.remarque = req.body.remarque;
-    assignment.eleves = req.body.eleves;
-    assignment.matiere = req.body.matiere;
+/*function postAssignment(req, res) {
+    let assignment = new Assignment({
+        id: req.body.id,
+        nom: req.body.nom,
+        dateDeRendu: req.body.dateDeRendu,
+        rendu: req.body.rendu,
+        remarque: req.body.remarque,
+        eleves: req.body.eleves,
+        matiere: req.body.matiere
+    });
 
     console.log("POST assignment reçu :");
-    console.log(assignment)
+    console.log(assignment);
 
-    assignment.save( (err) => {
-        if(err){
-            res.send('cant post assignment ', err);
+    assignment.save((err, savedAssignment) => {
+        if (err) {
+            console.error('Erreur lors de l’enregistrement de l’assignment:', err);
+            return res.status(500).send('Erreur lors de l’enregistrement de l’assignment');
         }
-        res.json({ message: `${assignment.nom} saved!`})
-    })
-}
+        res.status(201).json(savedAssignment);
+    });
+}*/
+function postAssignment(req, res) {
+    let assignment = new Assignment(req.body);
+    
+    assignment.save((err) => {
+      if (err) {
+        res.send('cant post assignment ', err);
+      }
+      res.json({ message: `${assignment.nom} saved!`});
+    });
+  }
+  
+
 
 // Update d'un assignment (PUT)
 function updateAssignment(req, res) {

@@ -3,8 +3,8 @@ let Schema = mongoose.Schema;
 
 let AssignmentSchema = Schema({
     id: Number,
-    dateDeRendu: Date,
     nom: String,
+    dateDeRendu: Date,
     rendu: Boolean,
     remarque: String,
     eleves: [{type : mongoose.Schema.Types.ObjectId, ref: 'Eleve'}],
