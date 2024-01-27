@@ -2,28 +2,28 @@ let Assignment = require('../model/assignment');
 const Counters = require('../model/Counters');
 
 // Récupérer tous les assignments (GET)
-async function getAssignments(req, res){
+async function getAssignments(req, res) {
     try {
-        const aggregate = Assignment.aggregate(aggregateQuery);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 50;
+
+        // Vous pouvez ajouter d'autres paramètres d'agrégation si nécessaire
+        const aggregateQuery = []; // Par exemple, ajouter des étapes de filtrage, tri, etc.
+
         const options = {
-            page: parseInt(req.query.page) || 1,
-            limit: parseInt(req.query.limit) || 10,
+            page: page,
+            limit: limit,
         };
 
-        await Assignment.aggregatePaginate(aggregate, options)
-            .then(assignments => {
-                res.status(200).json(assignments);
-            })
-            .catch(error => {
-                res.status(500).json({ message: 'Erreur serveur pour getAssignments', error });
-            });
+        const result = await Assignment.aggregatePaginate(Assignment.aggregate(aggregateQuery), options);
+        res.status(200).json(result);
 
-        //const assignments = await Assignment.find({});
-        //res.status(200).json(assignments);
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur pour getAssignments', error });
+        console.error("Erreur serveur pour getAssignments:", error); // Log pour le débogage
+        res.status(500).json({ message: 'Erreur serveur pour getAssignments', error: error.message });
     }
 }
+
 
 // Récupérer un assignment par son _id (GET)
 async function getAssignment(req, res){

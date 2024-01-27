@@ -15,6 +15,7 @@ mongoose.Promise = global.Promise;
 
 // remplacer toute cette chaine par l'URI de connexion à votre propre base dans le cloud s
 //const uri = 'mongodb+srv://mb:P7zM3VePm0caWA1L@cluster0.zqtee.mongodb.net/assignments?retryWrites=true&w=majority';
+//mongodb+srv://<username>:<password>@<your-cluster-url>/<database>?retryWrites=true&w=majority
 const uri = 'mongodb+srv://dioprawane1601:LO4xmlUI51sUWPTl@cluster0.qfha9nh.mongodb.net/assignments?retryWrites=true&w=majority';
 
 const options = {
@@ -89,11 +90,14 @@ app.use(bodyParser.json());
 
 let port = process.env.PORT || 8010;
 
+/*app.route(prefix + '/assignments/get/:id')
+  .get(assignment.getAssignment)
+
+app.route(prefix + '/get/assignments')
+  .get(assignment.getAssignments)*/
+
 // les routes
 const prefix = '/api';
-
-app.route(prefix + '/assignments/get/:id')
-  .get(assignment.getAssignment)
 
 app.route(prefix + '/assignments')
   .get(assignment.getAssignments)
