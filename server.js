@@ -1,7 +1,10 @@
+
 let express = require('express');
+//let app = express();
 let app = express();
 let bodyParser = require('body-parser');
 let assignment = require('./routes/assignments');
+//let routes = require('./routes/routes.js');
 let matiere = require('./routes/matieres');
 let eleve = require('./routes/eleves');
 let cors = require('cors');
@@ -23,8 +26,8 @@ const options = {
 mongoose.connect(uri, options)
   .then(() => {
     console.log("Connecté à la base MongoDB assignments dans le cloud !");
-    //console.log("at URI = " + uri);
-    //console.log("vérifiez with http://localhost:8010/api/assignments que cela fonctionne")
+    console.log("at URI = " + uri);
+    console.log("vérifiez with http://localhost:8010/api/assignments que cela fonctionne")
     },
     err => {
       console.log('Erreur de connexion: ', err);
@@ -82,10 +85,15 @@ module.exports = app;*/
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+//app.use(routes);
+
 let port = process.env.PORT || 8010;
 
 // les routes
 const prefix = '/api';
+
+app.route(prefix + '/assignments/get/:id')
+  .get(assignment.getAssignment)
 
 app.route(prefix + '/assignments')
   .get(assignment.getAssignments)

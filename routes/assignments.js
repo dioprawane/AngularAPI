@@ -1,89 +1,116 @@
 let Assignment = require('../model/assignment');
+const Counters = require('../model/Counters');
 
 // Récupérer tous les assignments (GET)
-function getAssignments(req, res){
-    Assignment.find((err, assignments) => {
-        if(err){
-            res.send(err)
-        }
+async function getAssignments(req, res){
+    try {
+        const aggregate = Assignment.aggregate(aggregateQuery);
+        const options = {
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 10,
+        };
 
-        res.send(assignments);
-    });
+        await Assignment.aggregatePaginate(aggregate, options)
+            .then(assignments => {
+                res.status(200).json(assignments);
+            })
+            .catch(error => {
+                res.status(500).json({ message: 'Erreur serveur pour getAssignments', error });
+            });
+
+        //const assignments = await Assignment.find({});
+        //res.status(200).json(assignments);
+    } catch (error) {
+        res.status(500).json({ message: 'Erreur serveur pour getAssignments', error });
+    }
 }
 
 // Récupérer un assignment par son _id (GET)
-function getAssignment(req, res){
-    let assignmentId = req.params.id;
+async function getAssignment(req, res){
+    let assignmentId = req.params._id;
 
-    Assignment.findOne({_id: assignmentId}, (err, assignment) =>{
-        if(err){res.send(err)}
-        res.json(assignment);
-    });
+    try {
+        const assignment = await Assignment.findById(assignmentId);
+        if (assignment) {
+            res.json(assignment);
+        } else {
+            res.status(404).json({ message: 'Assignment non trouvé' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur lors de la récupération de l\'assignment', err });
+    }
 }
-
 
 // Ajout d'un assignment (POST)
-/*function postAssignment(req, res) {
-    let assignment = new Assignment({
-        id: req.body.id,
-        nom: req.body.nom,
-        dateDeRendu: req.body.dateDeRendu,
-        rendu: req.body.rendu,
-        remarque: req.body.remarque,
-        eleves: req.body.eleves,
-        matiere: req.body.matiere
-    });
-
-    console.log("POST assignment reçu :");
-    console.log(assignment);
-
-    assignment.save((err, savedAssignment) => {
-        if (err) {
-            console.error('Erreur lors de l’enregistrement de l’assignment:', err);
-            return res.status(500).send('Erreur lors de l’enregistrement de l’assignment');
-        }
+async function postAssignment(req, res) {
+    try {
+        let assignment = new Assignment(req.body);
+        console.log(assignment);
+        /*console.log('matiere body',req.body.matiere);
+        assignment.matiere = req.body.matiere;
+        console.log('assignment matiere',assignment.matiere);*/
+        const savedAssignment = await assignment.save();
         res.status(201).json(savedAssignment);
-    });
-}*/
-function postAssignment(req, res) {
-    let assignment = new Assignment(req.body);
-    
-    assignment.save((err) => {
-      if (err) {
-        res.send('cant post assignment ', err);
-      }
-      res.json({ message: `${assignment.nom} saved!`});
-    });
-  }
-  
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout des assignments:', error);
+        res.status(500).json({ message: 'Erreur serveur pour postAssignment', error });
+    }
+    /*try {
+        let assignment = new Assignment();
+        assignment.id = await getNextSequence('assignmentId');
+        assignment.nom = req.body.nom;
+        assignment.dateDeRendu = req.body.dateDeRendu;
+        assignment.rendu = req.body.rendu;
+        assignment.remarque = req.body.remarque;
+        assignment.eleves = req.body.eleves;
+        assignment.matiere = req.body.matiere;
 
+        console.log(assignment);
+
+        await Assignment.save(assignment);
+
+        res.status(201).json(assignment);
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout des assignments:', error);
+        res.status(500).json({ message: 'Erreur serveur pour postAssignment' });
+    }*/
+}
+
+async function getNextSequence(name) {
+    const counter = await Counters.findOneAndUpdate(
+        { _id: name },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+    );
+    return counter.seq;
+}
 
 // Update d'un assignment (PUT)
-function updateAssignment(req, res) {
-    console.log("UPDATE recu assignment : ");
-    console.log(req.body);
-    Assignment.findByIdAndUpdate(req.body._id, req.body, {new: true}, (err, assignment) => {
-        if (err) {
-            console.log(err);
-            res.send(err)
+async function updateAssignment(req, res) {
+    try {
+        const updatedAssignment = await Assignment.findByIdAndUpdate(req.body._id, req.body, { new: true });
+        if (updatedAssignment) {
+            res.json(updatedAssignment);
         } else {
-          res.json({message: 'updated'})
+            res.status(404).json({ message: 'Assignment non trouvé' });
         }
-
-      // console.log('updated ', assignment)
-    });
-
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur lors de la mise à jour de l\'assignment', err });
+    }
 }
 
-// suppression d'un assignment (DELETE)
-function deleteAssignment(req, res) {
-
-    Assignment.findByIdAndRemove(req.params.id, (err, assignment) => {
-        if (err) {
-            res.send(err);
+// Suppression d'un assignment (DELETE)
+async function deleteAssignment(req, res) {
+    try {
+        const deletedAssignment = await Assignment.findByIdAndRemove(req.params.id);
+        if (deletedAssignment) {
+            res.json({ message: 'Assignment supprimé avec succès' });
+        } else {
+            res.status(404).json({ message: 'Assignment non trouvé' });
         }
-        res.json({message: `${assignment.nom} deleted`});
-    })
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur lors de la suppression de l\'assignment', err });
+    }
 }
 
-module.exports = { getAssignments, postAssignment, getAssignment, updateAssignment, deleteAssignment };
+module.exports = { getAssignments, getAssignment, postAssignment, updateAssignment, deleteAssignment };

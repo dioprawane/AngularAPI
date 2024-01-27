@@ -7,8 +7,27 @@ let AssignmentSchema = Schema({
     dateDeRendu: Date,
     rendu: Boolean,
     remarque: String,
-    eleves: [{type : mongoose.Schema.Types.ObjectId, ref: 'Eleve'}],
-    matiere: {type: mongoose.Schema.Types.ObjectId, ref: 'Matiere'}
+    eleves: [
+        {
+            idEleve: Number,
+            nom: String,
+            prenom: String,
+            note: Number
+        }
+    ],
+    matiere_idMatiere: Number,
+    matiere_nom: String,
+    matiere_enseignant: String,
+    matiere_imageMatiere: String,
+    matiere_imageProf: String
+
+    /*matiere: {
+        idMatiere: Number,
+        nom: String,
+        enseignant: String,
+        imageMatiere: String,
+        imageProf: String
+    }*/
 });
 
 // C'est à travers ce modèle Mongoose qu'on pourra faire le CRUD
