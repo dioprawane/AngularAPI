@@ -90,14 +90,17 @@ app.use(bodyParser.json());
 
 let port = process.env.PORT || 8010;
 
-/*app.route(prefix + '/assignments/get/:id')
-  .get(assignment.getAssignment)
 
-app.route(prefix + '/get/assignments')
+
+/*app.route(prefix + '/get/assignments')
   .get(assignment.getAssignments)*/
 
 // les routes
 const prefix = '/api';
+
+// Votre route doit ressembler à ceci
+app.route(prefix + '/assignments/id/:id')
+  .get(assignment.getAssignment);
 
 app.route(prefix + '/assignments')
   .get(assignment.getAssignments)

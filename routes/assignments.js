@@ -2,8 +2,9 @@ let Assignment = require('../model/assignment');
 const Counters = require('../model/Counters');
 
 // Récupérer tous les assignments (GET)
-async function getAssignments(req, res) {
+/*async function getAssignments(req, res) {
     try {
+
         // Récupérer les paramètres de pagination de la requête
         let page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 10;
@@ -30,7 +31,44 @@ async function getAssignments(req, res) {
     } catch (err) {
         res.status(500).json({ message: "Erreur serveur lors de la récupération des assignments", error: error.message });
     }
+}*/
+
+async function getAssignments(req, res) {
+    try {
+        let query = {};
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+
+        // Filtre sur le rendu
+        if(req.query.trie === "rendu") {
+            query.rendu = true;
+        } else if(req.query.trie === "nonRendu") {
+            query.rendu = false;
+        }
+
+        // Recherche par nom
+        if(req.query.recherche && req.query.recherche !== 'all') {
+            query.nom = { $regex: new RegExp(req.query.recherche, 'i') };
+        }
+
+        const totalCount = await Assignment.countDocuments(query);
+
+        // Trouver les assignments avec pagination et filtre
+        const assignments = await Assignment.find(query)
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.status(200).json({
+            total: totalCount,
+            page: page,
+            pageSize: limit,
+            assignments: assignments
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Erreur serveur lors de la récupération des assignments", error: err.message });
+    }
 }
+
 
 /*
 Assignment.find((err, assignments) => {
@@ -44,11 +82,28 @@ Assignment.find((err, assignments) => {
 
 
 // Récupérer un assignment par son _id (GET)
-async function getAssignment(req, res){
-    let assignmentId = req.params._id;
-
+/*async function getAssignment(req, res){
+    let assignmentId = req.params.id;
     try {
-        const assignment = await Assignment.findById(assignmentId);
+        const assignment = await Assignment.findById({id : assignmentId});
+        if (assignment) {
+            res.json(assignment);
+        } else {
+            res.status(404).json({ message: 'Assignment non trouvé' });
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Erreur lors de la récupération de l\'assignment', err });
+    }
+}*/
+async function getAssignment(req, res) {
+    let assignmentId = req.params.id;
+    try {
+        // Assurez-vous de convertir la chaîne en nombre si nécessaire
+        const idNum = parseInt(assignmentId);
+
+        // Recherchez par le champ 'id', pas '_id'
+        const assignment = await Assignment.findOne({ id: idNum });
+
         if (assignment) {
             res.json(assignment);
         } else {
@@ -58,6 +113,7 @@ async function getAssignment(req, res){
         res.status(500).json({ message: 'Erreur lors de la récupération de l\'assignment', err });
     }
 }
+
 
 // Ajout d'un assignment (POST)
 async function postAssignment(req, res) {
