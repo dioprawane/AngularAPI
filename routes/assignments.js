@@ -4,25 +4,43 @@ const Counters = require('../model/Counters');
 // Récupérer tous les assignments (GET)
 async function getAssignments(req, res) {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 50;
+        // Récupérer les paramètres de pagination de la requête
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
 
-        // Vous pouvez ajouter d'autres paramètres d'agrégation si nécessaire
-        const aggregateQuery = []; // Par exemple, ajouter des étapes de filtrage, tri, etc.
+        // Calculer le nombre total d'assignments
+        const totalCount = await Assignment.countDocuments();
 
-        const options = {
-            page: page,
-            limit: limit,
-        };
-
-        const result = await Assignment.aggregatePaginate(Assignment.aggregate(aggregateQuery), options);
-        res.status(200).json(result);
-
-    } catch (error) {
-        console.error("Erreur serveur pour getAssignments:", error); // Log pour le débogage
-        res.status(500).json({ message: 'Erreur serveur pour getAssignments', error: error.message });
+        // Trouver les assignments avec une pagination
+        Assignment.find()
+            .skip((page - 1) * limit) // Ignorer les N premiers documents
+            .limit(limit) // Limiter le résultat à 'limit' documents
+            .exec((err, assignments) => {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    res.status(200).json({
+                        total: totalCount,
+                        page: page,
+                        pageSize: assignments.length,
+                        assignments: assignments
+                    });
+                }
+            });
+    } catch (err) {
+        res.status(500).json({ message: "Erreur serveur lors de la récupération des assignments", error: error.message });
     }
 }
+
+/*
+Assignment.find((err, assignments) => {
+            if(err){
+                res.send(err)
+            }
+    
+            res.send(assignments);
+        });
+*/
 
 
 // Récupérer un assignment par son _id (GET)
