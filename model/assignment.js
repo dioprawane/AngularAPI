@@ -21,7 +21,6 @@ let AssignmentSchema = Schema({
     matiere_enseignant: String,
     matiere_imageMatiere: String,
     matiere_imageProf: String
-
     /*matiere: {
         idMatiere: Number,
         nom: String,

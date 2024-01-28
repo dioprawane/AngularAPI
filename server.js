@@ -55,33 +55,6 @@ app.use(function (req, res, next) {
 
 app.options('*', cors(corsOptions)); // Active CORS pour les requêtes OPTIONS
 
-
-// Pour les formulaires
-/*app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-
-let port = process.env.PORT || 8010;
-
-// les routes
-const prefix = '/api';
-
-app.route(prefix + '/assignments')
-  .get(assignment.getAssignments);
-
-app.route(prefix + '/assignments/:id')
-  .get(assignment.getAssignment)
-  .delete(assignment.deleteAssignment);
-
-
-app.route(prefix + '/assignments')
-  .post(assignment.postAssignment)
-  .put(assignment.updateAssignment);
-
-// On démarre le serveur
-app.listen(port, "0.0.0.0");
-console.log('Serveur démarré sur http://localhost:' + port);
-
-module.exports = app;*/
 // Pour les formulaires
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -89,11 +62,6 @@ app.use(bodyParser.json());
 //app.use(routes);
 
 let port = process.env.PORT || 8010;
-
-
-
-/*app.route(prefix + '/get/assignments')
-  .get(assignment.getAssignments)*/
 
 // les routes
 const prefix = '/api';
